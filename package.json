@@ -1,0 +1,14 @@
+{
+  "name": "escolinhaativa",
+  "version": "1.0.0",
+  "description": "MVP micro SaaS para escolinhas de futebol: alunos, mensalidades, presencas e contato com responsaveis.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/flow.test.js"
+  },
+  "dependencies": {}
+}
