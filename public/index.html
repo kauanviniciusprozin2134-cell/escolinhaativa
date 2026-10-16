@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EscolinhaAtiva — gestão de escolinhas de futebol</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+<!-- ================= TELA DE LOGIN ================= -->
+<div id="tela-auth" class="auth-wrap" hidden>
+  <div class="auth-card">
+    <div class="brand">
+      <div class="brand-ball">⚽</div>
+      <div>
+        <h1>EscolinhaAtiva</h1>
+        <p class="muted">Alunos, mensalidades e presenças em um só lugar.</p>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-auth-tab="login" role="tab">Entrar</button>
+      <button class="tab" data-auth-tab="cadastro" role="tab">Criar conta</button>
+    </div>
+
+    <form id="form-login" class="stack" autocomplete="on">
+      <label>E-mail
+        <input type="email" name="email" required placeholder="voce@escolinha.com" autocomplete="email" />
+      </label>
+      <label>Senha
+        <input type="password" name="senha" required placeholder="Sua senha" autocomplete="current-password" />
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+    </form>
+
+    <form id="form-cadastro" class="stack hidden" autocomplete="on">
+      <label>Nome da escolinha
+        <input type="text" name="nome" required placeholder="Ex.: Escolinha Bola de Ouro" />
+      </label>
+      <label>E-mail
+        <input type="email" name="email" required placeholder="voce@escolinha.com" autocomplete="email" />
+      </label>
+      <label>Senha
+        <input type="password" name="senha" required minlength="4" placeholder="Mínimo de 4 caracteres" autocomplete="new-password" />
+      </label>
+      <button class="btn btn-primary btn-block" type="submit">Criar conta e entrar</button>
+      <p class="muted small">Cada escolinha vê somente os seus próprios dados.</p>
+    </form>
+
+    <p id="auth-erro" class="alert alert-erro hidden"></p>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="tela-app" class="app hidden" hidden>
+  <header class="topbar">
+    <div class="brand brand-sm">
+      <div class="brand-ball">⚽</div>
+      <div>
+        <strong>EscolinhaAtiva</strong>
+        <span id="nome-escolinha" class="muted small block"></span>
+      </div>
+    </div>
+    <button id="btn-sair" class="btn btn-ghost" type="button">Sair</button>
+  </header>
+
+  <nav class="menu" id="menu">
+    <button class="menu-item active" data-tela="painel">Painel</button>
+    <button class="menu-item" data-tela="alunos">Alunos</button>
+    <button class="menu-item" data-tela="turmas">Turmas</button>
+    <button class="menu-item" data-tela="presencas">Presenças</button>
+    <button class="menu-item" data-tela="mensalidades">Mensalidades</button>
+  </nav>
+
+  <main id="conteudo">
+
+    <!-- ---------- PAINEL ---------- -->
+    <section class="tela" id="tela-painel">
+      <div class="page-head">
+        <h2>Painel</h2>
+        <p class="muted" id="painel-competencia"></p>
+      </div>
+      <div class="cards" id="painel-cards"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Alunos que precisam de atenção</h3>
+          <span class="muted small">Mensalidade atrasada ou 2 faltas seguidas</span>
+        </div>
+        <div id="painel-alertas"></div>
+      </div>
+    </section>
+
+    <!-- ---------- ALUNOS ---------- -->
+    <section class="tela hidden" id="tela-alunos">
+      <div class="page-head row-between">
+        <h2>Alunos</h2>
+        <button class="btn btn-primary" id="btn-novo-aluno" type="button">+ Novo aluno</button>
+      </div>
+
+      <div class="card" id="card-form-aluno" hidden>
+        <div class="card-head"><h3 id="titulo-form-aluno">Novo aluno</h3></div>
+        <form id="form-aluno" class="grid-form">
+          <input type="hidden" name="id" />
+          <label>Nome do aluno *<input type="text" name="nome" required /></label>
+          <label>Responsável *<input type="text" name="responsavel" required /></label>
+          <label>WhatsApp *<input type="text" name="whatsapp" required placeholder="(11) 99999-0000" /></label>
+          <label>Turma
+            <select name="turma_id" id="aluno-turma"></select>
+          </label>
+          <label>Valor da mensalidade (R$) *<input type="number" name="valor_mensalidade" step="0.01" min="0" required value="120" /></label>
+          <label>Dia do vencimento *<input type="number" name="dia_vencimento" min="1" max="28" required value="10" /></label>
+          <label>Situação
+            <select name="situacao">
+              <option value="ativo">Ativo</option>
+              <option value="inativo">Inativo</option>
+            </select>
+          </label>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Salvar</button>
+            <button class="btn btn-ghost" type="button" id="btn-cancelar-aluno">Cancelar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="filtros">
+          <input type="search" id="busca-aluno" placeholder="Buscar por aluno ou responsável" />
+        </div>
+        <div id="lista-alunos"></div>
+      </div>
+    </section>
+
+    <!-- ---------- TURMAS ---------- -->
+    <section class="tela hidden" id="tela-turmas">
+      <div class="page-head row-between">
+        <h2>Turmas</h2>
+        <button class="btn btn-primary" id="btn-nova-turma" type="button">+ Nova turma</button>
+      </div>
+
+      <div class="card" id="card-form-turma" hidden>
+        <div class="card-head"><h3 id="titulo-form-turma">Nova turma</h3></div>
+        <form id="form-turma" class="grid-form">
+          <input type="hidden" name="id" />
+          <label>Nome da turma *<input type="text" name="nome" required placeholder="Ex.: Sub-11" /></label>
+          <label>Professor *<input type="text" name="professor" required placeholder="Ex.: Professor Carlos" /></label>
+          <label>Horários dos treinos *<input type="text" name="horarios" required placeholder="Ex.: Ter e Qui, 18h às 19h30" /></label>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="submit">Salvar</button>
+            <button class="btn btn-ghost" type="button" id="btn-cancelar-turma">Cancelar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card"><div id="lista-turmas"></div></div>
+    </section>
+
+    <!-- ---------- PRESENÇAS ---------- -->
+    <section class="tela hidden" id="tela-presencas">
+      <div class="page-head"><h2>Presenças</h2></div>
+
+      <div class="card">
+        <div class="grid-form">
+          <label>Turma
+            <select id="presenca-turma"></select>
+          </label>
+          <label>Data do treino
+            <input type="date" id="presenca-data" />
+          </label>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btn-carregar-presenca" type="button">Carregar lista</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head row-between">
+          <h3 id="presenca-titulo">Lista de chamada</h3>
+          <div class="chips">
+            <button class="btn btn-ghost btn-sm" id="btn-todos-presentes" type="button">Todos presentes</button>
+            <button class="btn btn-ghost btn-sm" id="btn-limpar-presenca" type="button">Limpar</button>
+          </div>
+        </div>
+        <div id="lista-presencas"><p class="muted">Escolha a turma e a data e clique em “Carregar lista”.</p></div>
+        <div class="form-actions" id="presenca-acoes" hidden>
+          <button class="btn btn-primary" id="btn-salvar-presenca" type="button">Salvar chamada</button>
+          <span class="muted small" id="presenca-resumo"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- MENSALIDADES ---------- -->
+    <section class="tela hidden" id="tela-mensalidades">
+      <div class="page-head"><h2>Mensalidades</h2></div>
+
+      <div class="card">
+        <div class="grid-form">
+          <label>Competência (mês)
+            <input type="month" id="mens-competencia" />
+          </label>
+          <label>Situação
+            <select id="mens-filtro">
+              <option value="">Todas</option>
+              <option value="pendente">Pendentes</option>
+              <option value="pago">Pagas</option>
+              <option value="atrasado">Atrasadas</option>
+            </select>
+          </label>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btn-gerar-mens" type="button">Gerar mensalidades do mês</button>
+            <button class="btn btn-ghost" id="btn-buscar-mens" type="button">Atualizar lista</button>
+          </div>
+        </div>
+        <p class="muted small">A geração cria um registro por aluno ativo e não duplica o que já existe.</p>
+      </div>
+
+      <div class="card">
+        <div class="cards cards-sm" id="mens-resumo"></div>
+        <div id="lista-mensalidades"></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= MODAL ================= -->
+<div id="modal" class="modal-wrap hidden" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="modal-titulo">Detalhes</h3>
+      <button class="btn btn-ghost btn-sm" id="modal-fechar" type="button">Fechar</button>
+    </div>
+    <div id="modal-corpo" class="modal-corpo"></div>
+  </div>
+</div>
+
+<div id="toasts" class="toasts"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
