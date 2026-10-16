@@ -1,0 +1,5 @@
+node_modules/
+*.log
+
+# banco de dados local: no servidor de hospedagem o banco é criado em ESCOLINHA_DB
+data/
